@@ -23,7 +23,7 @@ After GitHub Pages is enabled, play here:
 
 ## Mobile / phones
 
-Works on phones and tablets: on-screen **D-pad** (move, jump, duck) plus **SWING** and **THROW** buttons. Tap the screen to continue between rounds. Landscape works best; a hint appears if you hold the phone upright.
+Works on phones and tablets: **analog stick** (left) for 360° move / jump / duck, large **SWING** and **THROW** buttons (right). Screen is locked so the page won’t scroll. Tap to continue between rounds. Landscape works best.
 
 ## Run locally
 

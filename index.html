@@ -31,25 +31,24 @@
         <span id="enemy-hp-text" class="hp-text">100</span>
       </div>
     </header>
-    <canvas id="game-canvas" width="960" height="540"></canvas>
-    <div id="fight-announce" class="hidden" aria-live="polite"></div>
-    <div id="message-overlay" class="hidden">
-      <p id="message-text"></p>
-      <p id="message-sub"></p>
-      <p class="hint">PRESS ENTER TO CONTINUE</p>
-    </div>
-    <div id="touch-controls">
-      <div class="touch-dpad">
-        <button type="button" class="touch-btn" data-key="ArrowUp" aria-label="Jump">▲</button>
-        <div class="touch-dpad-mid">
-          <button type="button" class="touch-btn" data-key="ArrowLeft" aria-label="Left">◀</button>
-          <button type="button" class="touch-btn" data-key="ArrowDown" aria-label="Duck">▼</button>
-          <button type="button" class="touch-btn" data-key="ArrowRight" aria-label="Right">▶</button>
-        </div>
+    <div id="play-area">
+      <canvas id="game-canvas" width="960" height="540"></canvas>
+      <div id="fight-announce" class="hidden" aria-live="polite"></div>
+      <div id="message-overlay" class="hidden">
+        <p id="message-text"></p>
+        <p id="message-sub"></p>
+        <p class="hint">PRESS ENTER TO CONTINUE</p>
       </div>
-      <div class="touch-actions">
-        <button type="button" class="touch-btn action-swing" data-key="KeyZ">SWING</button>
-        <button type="button" class="touch-btn action-throw" data-key="KeyX">THROW</button>
+      <div id="touch-controls">
+        <div id="joystick-zone" aria-label="Move">
+          <div class="joystick-base">
+            <div class="joystick-knob"></div>
+          </div>
+        </div>
+        <div class="touch-actions">
+          <button type="button" class="touch-btn action-swing" data-key="KeyZ">SWING</button>
+          <button type="button" class="touch-btn action-throw" data-key="KeyX">THROW</button>
+        </div>
       </div>
     </div>
     <footer id="controls-hint">

@@ -772,30 +772,59 @@ class Fighter {
     }
 
     const speed = 4.2 * this.speedMult;
-    this.ducking = keys['ArrowDown'] && this.onGround;
+    const useAnalog =
+      typeof TouchInput !== 'undefined' && TouchInput.active && TouchInput.analog.active;
 
-    if (!this.ducking) {
-      if (keys['ArrowLeft']) {
-        this.vx = -speed;
-        this.facing = -1;
-        this.pose = 'walk';
-      } else if (keys['ArrowRight']) {
-        this.vx = speed;
-        this.facing = 1;
-        this.pose = 'walk';
+    if (useAnalog) {
+      const ax = TouchInput.analog.x;
+      const ay = TouchInput.analog.y;
+      const mag = TouchInput.analog.magnitude;
+      this.ducking = ay > 0.42 && this.onGround;
+
+      if (!this.ducking) {
+        if (Math.abs(ax) > 0.18) {
+          this.vx = ax * speed * Math.max(0.45, mag);
+          this.facing = ax > 0 ? 1 : -1;
+          this.pose = Math.abs(this.vx) > 0.8 ? 'walk' : 'idle';
+        } else {
+          this.vx = 0;
+          this.pose = 'idle';
+        }
+        if (ay < -0.42 && this.onGround) {
+          this.vy = -14;
+          this.onGround = false;
+          this.pose = 'jump';
+        }
       } else {
         this.vx = 0;
-        this.pose = 'idle';
-      }
-
-      if (keys['ArrowUp'] && this.onGround) {
-        this.vy = -14;
-        this.onGround = false;
-        this.pose = 'jump';
+        this.pose = 'duck';
       }
     } else {
-      this.vx = 0;
-      this.pose = 'duck';
+      this.ducking = keys['ArrowDown'] && this.onGround;
+
+      if (!this.ducking) {
+        if (keys['ArrowLeft']) {
+          this.vx = -speed;
+          this.facing = -1;
+          this.pose = 'walk';
+        } else if (keys['ArrowRight']) {
+          this.vx = speed;
+          this.facing = 1;
+          this.pose = 'walk';
+        } else {
+          this.vx = 0;
+          this.pose = 'idle';
+        }
+
+        if (keys['ArrowUp'] && this.onGround) {
+          this.vy = -14;
+          this.onGround = false;
+          this.pose = 'jump';
+        }
+      } else {
+        this.vx = 0;
+        this.pose = 'duck';
+      }
     }
 
     this.x += this.vx;

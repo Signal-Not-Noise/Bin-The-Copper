@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bin The Copper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <header id="hud-top">
+      <div class="fighter-hud player-hud">
+        <span class="name">SKINHEAD (UK)</span>
+        <div class="health-bar"><div id="player-health" class="health-fill"></div></div>
+        <span id="player-hp-text" class="hp-text">100</span>
+      </div>
+      <div id="center-hud">
+        <div id="game-title">BIN THE COPPER</div>
+        <div id="round-display">ROUND <span id="round-num">1</span></div>
+        <div id="score-display">
+          <span id="player-wins">0</span> - <span id="cop-wins">0</span>
+        </div>
+        <div id="level-display">LEVEL <span id="level-num">1</span></div>
+      </div>
+      <div class="fighter-hud enemy-hud">
+        <span class="name">PC COPPER</span>
+        <div class="health-bar"><div id="enemy-health" class="health-fill enemy-fill"></div></div>
+        <span id="enemy-hp-text" class="hp-text">100</span>
+      </div>
+    </header>
+    <canvas id="game-canvas" width="960" height="540"></canvas>
+    <div id="fight-announce" class="hidden" aria-live="polite"></div>
+    <div id="message-overlay" class="hidden">
+      <p id="message-text"></p>
+      <p id="message-sub"></p>
+      <p class="hint">PRESS ENTER TO CONTINUE</p>
+    </div>
+    <footer id="controls-hint">
+      ARROWS: MOVE / JUMP / DUCK &nbsp;|&nbsp; Z: SWING &nbsp;|&nbsp; X: THROW &nbsp;|&nbsp; M: MUTE &nbsp;|&nbsp; WALK INTO YOUR BIN TO EQUIP
+    </footer>
+  </div>
+  <script src="audio.js"></script>
+  <script src="sprites.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

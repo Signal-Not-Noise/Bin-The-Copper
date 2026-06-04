@@ -151,6 +151,8 @@ body.is-mobile {
   image-rendering: crisp-edges;
   background: #000;
   touch-action: none;
+  position: relative;
+  z-index: 1;
 }
 
 body.is-mobile #game-container {
@@ -269,13 +271,11 @@ body.is-mobile #controls-hint {
   letter-spacing: 0.5px;
 }
 
-/* --- Mobile touch controls (overlaid on game) --- */
+/* --- Mobile touch controls: fixed to screen edges --- */
 #touch-controls {
   display: none;
-  position: absolute;
-  inset: 0;
   pointer-events: none;
-  z-index: 5;
+  z-index: 200;
   touch-action: none;
 }
 
@@ -283,55 +283,92 @@ body.is-mobile #controls-hint {
   display: block;
 }
 
+/* Auto-show on touch phones even before JS runs */
+@media (hover: none) and (pointer: coarse) {
+  #touch-controls {
+    display: block;
+  }
+}
+
+body.is-mobile #touch-controls,
+#touch-controls.visible {
+  display: block !important;
+}
+
 #joystick-zone {
-  position: absolute;
-  left: max(8px, env(safe-area-inset-left));
-  bottom: max(12px, env(safe-area-inset-bottom));
-  width: 140px;
-  height: 140px;
+  position: fixed;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  width: 168px;
+  height: 168px;
   pointer-events: auto;
   touch-action: none;
+  z-index: 201;
+}
+
+#joystick-zone .control-label {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 7px;
+  color: #ffb703;
+  text-shadow: 0 1px 2px #000;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .joystick-base {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 128px;
-  height: 128px;
-  margin-left: -64px;
-  margin-top: -64px;
+  top: 54%;
+  width: 148px;
+  height: 148px;
+  margin-left: -74px;
+  margin-top: -74px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, rgba(80, 70, 55, 0.55) 0%, rgba(20, 18, 28, 0.75) 70%);
-  border: 3px solid rgba(255, 214, 102, 0.35);
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  background: radial-gradient(circle at 35% 30%, #4a4035 0%, #1a1520 85%);
+  border: 4px solid #ffb703;
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.6),
+    inset 0 0 24px rgba(0, 0, 0, 0.6),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+#joystick-zone.stick-active .joystick-base {
+  border-color: #ffeb3b;
+  box-shadow:
+    0 0 20px rgba(255, 183, 3, 0.4),
+    inset 0 0 24px rgba(0, 0, 0, 0.6);
 }
 
 .joystick-knob {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 56px;
-  height: 56px;
-  margin-left: -28px;
-  margin-top: -28px;
+  top: 54%;
+  width: 62px;
+  height: 62px;
+  margin-left: -31px;
+  margin-top: -31px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 25%, #6b5a45 0%, #2a2218 100%);
-  border: 3px solid #ffd166;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  background: radial-gradient(circle at 30% 25%, #8b7355 0%, #3d3228 100%);
+  border: 4px solid #fff3c4;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
   will-change: transform;
 }
 
 .touch-actions {
-  position: absolute;
-  right: max(8px, env(safe-area-inset-right));
-  bottom: max(12px, env(safe-area-inset-bottom));
+  position: fixed;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  width: min(42vw, 200px);
+  gap: 16px;
+  width: min(38vw, 210px);
+  min-width: 120px;
   pointer-events: auto;
   touch-action: none;
+  z-index: 201;
 }
 
 .touch-btn {
@@ -356,19 +393,23 @@ body.is-mobile #controls-hint {
 }
 
 .action-swing {
-  border-color: #c1121f;
-  color: #ff6b6b;
-  min-height: 82px;
-  font-size: 12px;
-  box-shadow: 0 0 16px rgba(193, 18, 31, 0.25);
+  border-color: #e63946;
+  color: #fff;
+  background: linear-gradient(180deg, #c1121f 0%, #9b2226 100%);
+  min-height: 92px;
+  font-size: 14px;
+  box-shadow: 0 4px 20px rgba(193, 18, 31, 0.55);
+  order: 1;
 }
 
 .action-throw {
   border-color: #457b9d;
-  color: #8ecae6;
-  min-height: 82px;
-  font-size: 12px;
-  box-shadow: 0 0 16px rgba(69, 123, 157, 0.25);
+  color: #e8f4fc;
+  background: linear-gradient(180deg, #1d3557 0%, #14243d 100%);
+  min-height: 72px;
+  font-size: 11px;
+  box-shadow: 0 4px 16px rgba(69, 123, 157, 0.45);
+  order: 2;
 }
 
 #rotate-hint {
@@ -392,27 +433,38 @@ body.is-mobile #controls-hint {
   display: block;
 }
 
-@media (max-width: 900px), (pointer: coarse) {
+@media (max-width: 1024px), (pointer: coarse), (hover: none) {
   #joystick-zone {
-    width: 150px;
-    height: 150px;
+    width: 180px;
+    height: 180px;
   }
 
   .joystick-base {
-    width: 138px;
-    height: 138px;
-    margin-left: -69px;
-    margin-top: -69px;
+    width: 158px;
+    height: 158px;
+    margin-left: -79px;
+    margin-top: -79px;
+  }
+
+  .joystick-knob {
+    width: 68px;
+    height: 68px;
+    margin-left: -34px;
+    margin-top: -34px;
   }
 
   .touch-actions {
-    width: min(44vw, 220px);
+    width: min(40vw, 230px);
   }
 
-  .action-swing,
+  .action-swing {
+    min-height: 100px;
+    font-size: 15px;
+  }
+
   .action-throw {
-    min-height: 88px;
-    font-size: 13px;
+    min-height: 76px;
+    font-size: 12px;
   }
 
   #game-container {

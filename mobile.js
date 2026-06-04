@@ -1,5 +1,5 @@
 /**
- * Mobile: fixed viewport, analog stick, large action buttons
+ * Mobile: fixed thumbstick (left), HIT/THROW (right), locked viewport
  */
 const TouchInput = {
   active: false,
@@ -7,7 +7,24 @@ const TouchInput = {
   joystickTouchId: null,
 
   isMobile() {
-    return window.matchMedia('(max-width: 900px), (pointer: coarse)').matches;
+    const touchDevice =
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches;
+    const narrowScreen = window.innerWidth <= 1024;
+    const shortScreen = window.innerHeight <= 700 && window.innerWidth <= 1200;
+    return touchDevice && (narrowScreen || shortScreen) || window.innerWidth <= 768;
+  },
+
+  enableTouchUI() {
+    const panel = document.getElementById('touch-controls');
+    TouchInput.active = true;
+    document.body.classList.add('is-mobile');
+    document.documentElement.classList.add('is-mobile');
+    if (panel) {
+      panel.classList.add('visible');
+      panel.setAttribute('aria-hidden', 'false');
+    }
   },
 
   setKey(code, down) {
@@ -60,6 +77,7 @@ const TouchInput = {
       TouchInput.analog.active = false;
       TouchInput.joystickTouchId = null;
       knob.style.transform = 'translate(0px, 0px)';
+      zone.classList.remove('stick-active');
       TouchInput.clearMovementKeys();
     };
 
@@ -67,7 +85,7 @@ const TouchInput = {
       const rect = base.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      maxRadius = rect.width * 0.36;
+      maxRadius = rect.width * 0.38;
 
       let dx = clientX - cx;
       let dy = clientY - cy;
@@ -79,19 +97,20 @@ const TouchInput = {
       }
 
       knob.style.transform = `translate(${dx}px, ${dy}px)`;
+      zone.classList.add('stick-active');
 
       const nx = dx / maxRadius;
       const ny = dy / maxRadius;
       TouchInput.analog.x = nx;
       TouchInput.analog.y = ny;
       TouchInput.analog.magnitude = Math.min(1, dist / maxRadius);
-      TouchInput.analog.active = dist > 10;
+      TouchInput.analog.active = dist > 8;
 
       TouchInput.clearMovementKeys();
-      if (nx < -0.22) keys.ArrowLeft = true;
-      if (nx > 0.22) keys.ArrowRight = true;
-      if (ny < -0.38) keys.ArrowUp = true;
-      if (ny > 0.38) keys.ArrowDown = true;
+      if (nx < -0.2) keys.ArrowLeft = true;
+      if (nx > 0.2) keys.ArrowRight = true;
+      if (ny < -0.35) keys.ArrowUp = true;
+      if (ny > 0.35) keys.ArrowDown = true;
     };
 
     const findTouch = (e, id) => {
@@ -107,6 +126,7 @@ const TouchInput = {
       (e) => {
         e.preventDefault();
         e.stopPropagation();
+        TouchInput.enableTouchUI();
         AudioEngine.ensureInit();
         if (TouchInput.joystickTouchId !== null) return;
         const t = e.changedTouches[0];
@@ -137,7 +157,6 @@ const TouchInput = {
     zone.addEventListener('touchend', endTouch, { passive: false });
     zone.addEventListener('touchcancel', endTouch, { passive: false });
 
-    // Mouse fallback for testing
     let mouseDown = false;
     zone.addEventListener('mousedown', (e) => {
       mouseDown = true;
@@ -159,8 +178,12 @@ const TouchInput = {
       'touchmove',
       (e) => {
         if (!TouchInput.active) return;
-        const t = e.target;
-        if (t.closest('#joystick-zone') || t.closest('.touch-btn') || t.closest('#message-overlay')) {
+        const el = e.target;
+        if (
+          el.closest('#joystick-zone') ||
+          el.closest('.touch-actions') ||
+          el.closest('#message-overlay')
+        ) {
           return;
         }
         e.preventDefault();
@@ -168,26 +191,30 @@ const TouchInput = {
       { passive: false }
     );
 
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (TouchInput.active) window.scrollTo(0, 0);
-      },
-      { passive: true }
-    );
+    window.addEventListener('scroll', () => {
+      if (TouchInput.active) window.scrollTo(0, 0);
+    });
   },
 
   init() {
     const panel = document.getElementById('touch-controls');
-    const rotateHint = document.getElementById('rotate-hint');
     const controlsHint = document.getElementById('controls-hint');
     const messageHint = document.querySelector('#message-overlay .hint');
     const playArea = document.getElementById('play-area');
 
     TouchInput.initJoystick();
     TouchInput.lockViewport();
-
     panel?.querySelectorAll('.touch-btn[data-key]').forEach((btn) => TouchInput.bindActionButton(btn));
+
+    // First touch on phone always enables controls (fixes hidden UI)
+    document.addEventListener(
+      'touchstart',
+      () => {
+        if (TouchInput.isMobile()) TouchInput.enableTouchUI();
+        AudioEngine.ensureInit();
+      },
+      { passive: true }
+    );
 
     const tapContinue = (e) => {
       if (typeof game !== 'undefined' && game.awaitingContinue) {
@@ -197,56 +224,55 @@ const TouchInput = {
       }
     };
     messageOverlay?.addEventListener('click', tapContinue);
-    messageOverlay?.addEventListener(
-      'touchend',
-      (e) => {
-        e.preventDefault();
-        tapContinue(e);
-      },
-      { passive: false }
-    );
+    messageOverlay?.addEventListener('touchend', tapContinue, { passive: false });
+
+    const resetStickVisual = () => {
+      TouchInput.analog.active = false;
+      TouchInput.clearMovementKeys();
+      const knob = document.querySelector('.joystick-knob');
+      const zone = document.getElementById('joystick-zone');
+      if (knob) knob.style.transform = 'translate(0px, 0px)';
+      zone?.classList.remove('stick-active');
+    };
 
     const updateLayout = () => {
       const mobile = TouchInput.isMobile();
-      document.body.classList.toggle('is-mobile', mobile);
-      document.documentElement.classList.toggle('is-mobile', mobile);
-      TouchInput.active = mobile;
-
-      if (panel) panel.classList.toggle('visible', mobile);
-      if (!mobile) resetStickIfNeeded();
-
-      if (controlsHint) {
-        controlsHint.textContent = mobile
-          ? 'Left stick: move / jump / duck  |  Right: SWING & THROW  |  Tap to continue'
-          : 'ARROWS: MOVE / JUMP / DUCK  |  Z: SWING  |  X: THROW  |  M: MUTE  |  WALK INTO YOUR BIN TO EQUIP';
-      }
-      if (messageHint) {
-        messageHint.textContent = mobile ? 'TAP TO CONTINUE' : 'PRESS ENTER TO CONTINUE';
-      }
 
       if (!mobile) {
+        TouchInput.active = false;
+        document.body.classList.remove('is-mobile');
+        document.documentElement.classList.remove('is-mobile');
+        panel?.classList.remove('visible');
+        panel?.setAttribute('aria-hidden', 'true');
         canvas.style.width = '';
         canvas.style.height = '';
         document.getElementById('game-container').style.width = '';
+        if (playArea) playArea.style.height = '';
         return;
+      }
+
+      TouchInput.enableTouchUI();
+
+      if (controlsHint) {
+        controlsHint.textContent =
+          'Thumbstick left — HIT & THROW right — tap screen to continue';
+      }
+      if (messageHint) {
+        messageHint.textContent = 'TAP TO CONTINUE';
       }
 
       const hud = document.getElementById('hud-top');
       const hudH = hud?.offsetHeight ?? 0;
       const playH = window.innerHeight - hudH;
-      if (playArea) {
-        playArea.style.height = `${playH}px`;
-      }
+      if (playArea) playArea.style.height = `${playH}px`;
 
       const availW = window.innerWidth;
       const availH = playH;
       const scale = Math.min(availW / 960, availH / 540);
-      const cssW = Math.floor(960 * scale);
-      const cssH = Math.floor(540 * scale);
+      canvas.style.width = `${Math.floor(960 * scale)}px`;
+      canvas.style.height = `${Math.floor(540 * scale)}px`;
 
-      canvas.style.width = `${cssW}px`;
-      canvas.style.height = `${cssH}px`;
-
+      const rotateHint = document.getElementById('rotate-hint');
       if (rotateHint) {
         rotateHint.classList.toggle('visible', window.innerHeight > window.innerWidth);
       }
@@ -254,19 +280,14 @@ const TouchInput = {
       window.scrollTo(0, 0);
     };
 
-    function resetStickIfNeeded() {
-      if (TouchInput.analog.active) {
-        TouchInput.analog.active = false;
-        TouchInput.clearMovementKeys();
-        const knob = document.querySelector('.joystick-knob');
-        if (knob) knob.style.transform = 'translate(0px, 0px)';
-      }
-    }
-
     window.addEventListener('resize', updateLayout);
-    window.addEventListener('orientationchange', () => setTimeout(updateLayout, 250));
+    window.addEventListener('orientationchange', () => setTimeout(updateLayout, 300));
     updateLayout();
   },
 };
 
-document.addEventListener('DOMContentLoaded', () => TouchInput.init());
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => TouchInput.init());
+} else {
+  TouchInput.init();
+}

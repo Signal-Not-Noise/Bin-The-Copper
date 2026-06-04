@@ -6,9 +6,9 @@ Retro street-fighter browser game. Fight the copper with wheelie bins!
 
 After GitHub Pages is enabled, play here:
 
-**https://YOUR-GITHUB-USERNAME.github.io/bin-the-copper/**
+**https://signal-not-noise.github.io/bin-the-copper/**
 
-(Replace `YOUR-GITHUB-USERNAME` with your real username.)
+(GitHub usernames in URLs are lowercase.)
 
 ## Controls
 
@@ -20,6 +20,10 @@ After GitHub Pages is enabled, play here:
 | Walk into your green bin | Equip |
 | Enter | Continue between rounds |
 | M | Mute sound |
+
+## Mobile / phones
+
+Works on phones and tablets: on-screen **D-pad** (move, jump, duck) plus **SWING** and **THROW** buttons. Tap the screen to continue between rounds. Landscape works best; a hint appears if you hold the phone upright.
 
 ## Run locally
 

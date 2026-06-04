@@ -47,6 +47,8 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
+document.addEventListener('touchstart', () => AudioEngine.ensureInit(), { once: false, passive: true });
+
 // --- Utilities ---
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;

@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Bin The Copper</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -35,12 +38,28 @@
       <p id="message-sub"></p>
       <p class="hint">PRESS ENTER TO CONTINUE</p>
     </div>
+    <div id="touch-controls">
+      <div class="touch-dpad">
+        <button type="button" class="touch-btn" data-key="ArrowUp" aria-label="Jump">▲</button>
+        <div class="touch-dpad-mid">
+          <button type="button" class="touch-btn" data-key="ArrowLeft" aria-label="Left">◀</button>
+          <button type="button" class="touch-btn" data-key="ArrowDown" aria-label="Duck">▼</button>
+          <button type="button" class="touch-btn" data-key="ArrowRight" aria-label="Right">▶</button>
+        </div>
+      </div>
+      <div class="touch-actions">
+        <button type="button" class="touch-btn action-swing" data-key="KeyZ">SWING</button>
+        <button type="button" class="touch-btn action-throw" data-key="KeyX">THROW</button>
+      </div>
+    </div>
     <footer id="controls-hint">
       ARROWS: MOVE / JUMP / DUCK &nbsp;|&nbsp; Z: SWING &nbsp;|&nbsp; X: THROW &nbsp;|&nbsp; M: MUTE &nbsp;|&nbsp; WALK INTO YOUR BIN TO EQUIP
     </footer>
+    <div id="rotate-hint">Rotate phone sideways for the best view</div>
   </div>
   <script src="audio.js"></script>
   <script src="sprites.js"></script>
   <script src="game.js"></script>
+  <script src="mobile.js"></script>
 </body>
 </html>
